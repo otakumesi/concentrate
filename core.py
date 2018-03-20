@@ -1,10 +1,10 @@
 import os
 import re
 from itertools import filterfalse
-from .utils import load_yaml
+from utils import load_yaml
 
 
-def program(args):
+def core(args):
     pass
 
 

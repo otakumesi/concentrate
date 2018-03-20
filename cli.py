@@ -1,3 +1,4 @@
+import sys
 from argparse import ArgumentParser
 
 
@@ -6,7 +7,17 @@ This is CLI tool resisting the temptetion what plays some of social media.
 """
 
 
-parser = ArgumentParser(
+def get_args(argv=sys.argv):
+    parser = ArgumentParser(
         prog="concentrate",
         description=DESCRIPTION
-        )
+    )
+
+    parser.add_argument(
+        "behavior",
+        help="""
+        behaving of the Concentrate.
+        start or stop
+        """
+    )
+    return parser.parse_args()
