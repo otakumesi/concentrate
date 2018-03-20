@@ -1,0 +1,9 @@
+forbidden_hosts:
+  - b.hatena.ne.jp
+  - twitter.com
+  - facebook.com
+  - news.yconbinator
+  - dev.to
+  - www.reddit.com
+  - getpocket.com
+  - qiita.com
