@@ -1,45 +1,43 @@
-import os
 import re
 from itertools import filterfalse
-from utils import load_yaml
+from config import DEFAULT_USER_HOSTS_PATH, DEFAULT_RECORD_IDENTIFIER, Config
 
 
 def core(args):
-    pass
+    conf = Config(DEFAULT_USER_HOSTS_PATH)
+    EtcHostsModifier(conf.over_write_hosts)
 
 
-class Concentrate:
-    DEFAULT_HOSTS_PATH = os.path.join('~', '.concentrate.hosts.yml')
-    DEFAULT_RECORD_IDENTIFIER = ' # WRITE_BY_CONCENTRATE'
+class EtcHostsModifier:
 
     def __init__(self,
-                 yaml_file_name=DEFAULT_HOSTS_PATH,
+                 over_write_hosts,
                  identifier=DEFAULT_RECORD_IDENTIFIER):
         self.identifier = identifier
-        self.forbidden_hosts_record = self.__build_hosts_record(yaml_file_name)
+        self.over_write_hosts = over_write_hosts
 
-    def write_etc_hosts(self):
+    def forbidden_hosts_record(self):
+        return self._build_hosts_record(self.over_write_hosts)
+
+    def _build_forbidden_hosts_record(self, over_write_hosts):
+        joined_forbidden_hosts = ' '.join(over_write_hosts)
+        return '127.0.0.1 ' + joined_forbidden_hosts
+
+    def write(self):
         with open('/etc/hosts', 'a+') as f:
-            f.write(self.forbidden_hosts_record + self.identifier)
+            f.write(self.forbidden_hosts_record() + self.identifier)
 
     def clean(self):
-        filtered_lines = self.__remove_concentrate_record()
+        filtered_lines = self._etc_hosts_exclude_added_record()
         if not filtered_lines:
             with open('/etc/hosts', 'w') as f:
                 f.writelines(filtered_lines)
 
-    def __concentrate_record(self):
+    def _etc_hosts_exclude_added_record(self):
         return filterfalse(
-            lambda line: re.search(Concentrate.ADD_RECORD_IDENTIFIER, line),
-            self.__current_etc_hosts())
+            lambda line: re.search(DEFAULT_RECORD_IDENTIFIER, line),
+            self._current_etc_hosts())
 
-    def __current_etc_hosts(self):
+    def _current_etc_hosts(self):
         with open('/etc/hosts', 'r+') as f:
             return f.readlines()
-
-    def __build_forbidden_hosts_record(self, yaml_file_name):
-        yaml_path = os.path.expanduser(yaml_file_name)
-        settings_dic = load_yaml(yaml_path)
-        over_write_hosts = settings_dic['forbidden_hosts']
-        joined_forbidden_hosts = ' '.join(over_write_hosts)
-        return '127.0.0.1 ' + joined_forbidden_hosts
