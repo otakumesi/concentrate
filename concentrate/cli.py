@@ -13,11 +13,6 @@ def get_args(argv=sys.argv):
         description=DESCRIPTION
     )
 
-    parser.add_argument(
-        "behavior",
-        help="""
-        behaving of the Concentrate.
-        start or stop
-        """
-    )
+    # parser.add_argument('-u', action='update')
+
     return parser.parse_args()
