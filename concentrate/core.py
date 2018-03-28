@@ -8,7 +8,12 @@ def program(args):
     etc_hosts = EtcHostsModifier(
             dirty_hosts=conf.dirty_hosts,
             identifier=conf.identifier)
-    etc_hosts.run()
+    if not etc_hosts.is_executed():
+        print('concentrate on!')
+        etc_hosts.write()
+    else:
+        print('concentrate off!')
+        etc_hosts.clean()
 
 
 class EtcHostsModifier:
@@ -27,17 +32,11 @@ class EtcHostsModifier:
         joined_forbidden_hosts = ' '.join(dirty_hosts)
         return '127.0.0.1 ' + joined_forbidden_hosts
 
-    def run(self):
-        if not self.is_executed():
-            self._write()
-        else:
-            self._clean()
-
-    def _write(self):
+    def write(self):
         with open(self.ETC_HOSTS_DIR, 'a+') as f:
             f.write(self.forbid_hosts_record() + self.identifier)
 
-    def _clean(self):
+    def clean(self):
         filtered_lines = self._etc_hosts_exclude_added_record()
         if filtered_lines:
             with open(self.ETC_HOSTS_DIR, 'w') as f:
