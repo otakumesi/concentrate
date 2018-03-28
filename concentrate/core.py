@@ -1,6 +1,6 @@
 import re
 from itertools import filterfalse
-from config import load
+from concentrate.config import load
 
 
 def program(args):
